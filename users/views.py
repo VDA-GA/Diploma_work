@@ -8,9 +8,9 @@ from users.services import generate_invited_code, generate_password, send_code
 
 
 class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView):
+    permission_classes = [AllowAny]
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
-    permission_classes = [AllowAny]
 
     def get_object(self):
         phone = self.request.data.get("phone")
@@ -45,12 +45,20 @@ class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.filter(active=True)
+    queryset = User.objects.all()
+
+    def get_object(self):
+        user = self.request.user
+        return User.objects.filter(pk=user.pk).first()
 
 
 class ActivationAPIView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+
+    def get_object(self):
+        user = self.request.user
+        return User.objects.filter(pk=user.pk).first()
 
     def perform_update(self, serializer):
         user = serializer.save()

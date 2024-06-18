@@ -37,6 +37,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         fields = ["id", "phone"]
 
     def validate_phone(self, value):
-        if not value.isdigit():
-            raise serializers.ValidationError("Введите правильный номер в виде 88888888888")
+        if value.isdigit() is False:
+            raise serializers.ValidationError("Номер телефона неверный. Введите номер по образцу: 88888888888")
         return value

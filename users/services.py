@@ -12,7 +12,6 @@ def generate_password():
 
 def send_code(phone):
     user = User.objects.get(phone=phone)
-    return user.password
 
 
 def generate_invited_code():

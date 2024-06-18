@@ -5,7 +5,7 @@ from users.models import User
 
 
 def generate_password():
-    password = ''.join(secrets.choice(string.digits) for i in range(4))
+    password = "".join(secrets.choice(string.digits) for _ in range(4))
     print(password)
     return password
 

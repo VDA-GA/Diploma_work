@@ -1,16 +1,16 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, views, status, generics, mixins
+from rest_framework import generics, mixins
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+
 from users.models import User
 from users.serializers import UserCreateSerializer, UserSerializer
+from users.services import generate_invited_code, generate_password, send_code
 
-from users.services import generate_password, send_code, generate_invited_code
 
-
-class UpdateCreateUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView):
+class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView):
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
+    permission_classes = [AllowAny]
 
     def get_object(self):
         phone = self.request.data.get("phone")
@@ -19,7 +19,13 @@ class UpdateCreateUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, Generic
     def perform_create(self, serializer):
         user = serializer.save()
         user.set_password(generate_password())
-        user.invite_code = generate_invited_code()
+        while True:
+            invite_code = generate_invited_code()
+            if User.objects.filter(invite_code=invite_code).exists():
+                continue
+            else:
+                user.invite_code = invite_code
+                break
         send_code(user.phone)
         user.save()
 
@@ -39,10 +45,10 @@ class UpdateCreateUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, Generic
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.filter(active=True)
 
 
-class UserUpdateAPIView(generics.UpdateAPIView):
+class ActivationAPIView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
@@ -52,7 +58,3 @@ class UserUpdateAPIView(generics.UpdateAPIView):
         if activate_code:
             user.invited_by = User.objects.filter(invite_code=activate_code).first()
         user.save()
-
-
-
-

@@ -1,0 +1,40 @@
+{% extends "rest_framework/base.html" %}
+{% load static %}
+
+{% block bootstrap_theme %}
+<link rel="stylesheet" href="{% static 'bootstrap.min.css' %}" type="text/css">
+{% endblock %}
+
+
+{% block bootstrap_navbar_variant %}{% endblock %}
+
+{% block content%}
+
+<div class="row text-center row-cols-1 row-cols-md-8 g-4">
+    <div class="col-md-8">
+        <div class="card border-primary mb-3" style="max-width: 540px;">
+
+            <div class="card-header">Пользователь {{user.phone}}</div>
+            <div class="card-body text-primary">
+                <ul>
+                    <li> Ваш инвайт код: {{ user.invite_code }}</li>
+                    {% if user.activate_code is None %}
+                    <li> Код приклашения не активирован</li>
+                    {% else %}
+                    <li>Код приглашения: {{ user.activate_code }}</li>
+                    {% endif %}
+                    {% if user.invited_users %}
+                    <li>Номера приглашенных пользователей: {{ user.invited_users }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-sm btn-primary"
+                   href="{% url 'users:code_activation' %}">Активация кода</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

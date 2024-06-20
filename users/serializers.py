@@ -12,15 +12,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "phone", "invite_code", "activate_code", "invited_by", "invited_users"]
+        fields = ["id", "phone", "invite_code", "activate_code", "invited_users"]
         read_only_fields = ("id", "phone", "invite_code", "invited_users")
-        extra_kwargs = {
-            "invited_by": {"write_only": True},
-        }
-        validators = []
+        # extra_kwargs = {
+        #     "invited_by": {"write_only": True},
+        # }
 
     def validate_activate_code(self, value):
-        user = self.context["request"].user
+        pk_user = self.context["request"].user.pk
+        user = User.objects.filter(pk=pk_user).first()
         invite_user = User.objects.filter(invite_code=value).first()
         if user.activate_code:
             raise serializers.ValidationError("Код уже активирован!")
@@ -40,3 +40,4 @@ class UserCreateSerializer(serializers.ModelSerializer):
         if value.isdigit() is False:
             raise serializers.ValidationError("Номер телефона неверный. Введите номер по образцу: 88888888888")
         return value
+

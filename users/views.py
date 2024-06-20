@@ -1,10 +1,13 @@
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, views
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny
-
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.models import User
 from users.serializers import UserCreateSerializer, UserSerializer
 from users.services import generate_invited_code, generate_password, send_code
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
 
 class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView):
@@ -46,6 +49,7 @@ class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView
 class UserRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    template_name = 'profile.html'
 
     def get_object(self):
         user = self.request.user
@@ -55,6 +59,7 @@ class UserRetrieveAPIView(generics.RetrieveAPIView):
 class ActivationAPIView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    authentication_classes = [SessionAuthentication, JWTTokenUserAuthentication]
 
     def get_object(self):
         user = self.request.user
@@ -66,3 +71,14 @@ class ActivationAPIView(generics.UpdateAPIView):
         if activate_code:
             user.invited_by = User.objects.filter(invite_code=activate_code).first()
         user.save()
+
+
+class UserProfile(GenericAPIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    template_name = 'profile.html'
+
+    def get(self, request):
+        user = User.objects.filter(pk=request.user.pk)[0]
+        return Response({'user': user})

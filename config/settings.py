@@ -141,3 +141,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+LOGIN_REDIRECT_URL = 'users:user_detail'
+LOGOUT_REDIRECT_URL = 'drf_auth:login'

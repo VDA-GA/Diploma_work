@@ -20,5 +20,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('api-auth/', include('rest_framework.urls', namespace="drf_auth")),
     path("", include("users.urls", namespace="users")),
+
 ]

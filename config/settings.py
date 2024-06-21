@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_yasg",
     "users.apps.UsersConfig",
 ]
 
@@ -142,5 +143,5 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
-LOGIN_REDIRECT_URL = 'users:user_detail'
-LOGOUT_REDIRECT_URL = 'drf_auth:login'
+LOGIN_REDIRECT_URL = "users:profile"
+LOGOUT_REDIRECT_URL = "users:login"

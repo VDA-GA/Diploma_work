@@ -40,4 +40,3 @@ class UserCreateSerializer(serializers.ModelSerializer):
         if value.isdigit() is False:
             raise serializers.ValidationError("Номер телефона неверный. Введите номер по образцу: 88888888888")
         return value
-

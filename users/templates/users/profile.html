@@ -19,9 +19,9 @@
                 <ul>
                     <li> Ваш инвайт код: {{ user.invite_code }}</li>
                     {% if user.activate_code is None %}
-                    <li> Код приклашения не активирован</li>
+                    <li> Код приглашения не активирован</li>
                     {% else %}
-                    <li>Код приглашения: {{ user.activate_code }}</li>
+                    <li>Активированный код приглашения: {{ user.activate_code }}</li>
                     {% endif %}
                     {% if user.invited_users %}
                     <li>Номера приглашенных пользователей: {{ user.invited_users }}</li>

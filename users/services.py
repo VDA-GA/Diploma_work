@@ -1,17 +1,17 @@
 import secrets
 import string
-
-from users.models import User
+import time
 
 
 def generate_password():
     password = "".join(secrets.choice(string.digits) for _ in range(4))
-    print(password)
     return password
 
 
-def send_code(phone):
-    user = User.objects.get(phone=phone)
+def send_code(phone, code):
+    time.sleep(4)
+    print(code)
+
 
 
 def generate_invited_code():

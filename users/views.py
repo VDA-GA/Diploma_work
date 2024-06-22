@@ -14,11 +14,10 @@ from users.serializers import UserCreateSerializer, UserSerializer
 from users.services import generate_invited_code, generate_password, send_code
 
 
-class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView):
+class APICodeGetAPIView(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView):
     permission_classes = [AllowAny]
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
-    renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
 
     def get_object(self):
         phone = self.request.data.get("phone")
@@ -34,27 +33,35 @@ class LoginUser(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericAPIView
             else:
                 user.invite_code = invite_code
                 break
-        send_code(user.phone)
+        send_code(user.phone, invite_code)
         user.save()
 
     def perform_update(self, serializer):
         user = serializer.save()
-        user.set_password(generate_password())
-        send_code(user.phone)
+        password = generate_password()
+        user.set_password(password)
+        send_code(user.phone, password)
         user.save()
 
     def post(self, request, *args, **kwargs):
         if self.request.data.get("phone"):
             phone = self.request.data.get("phone")
             if User.objects.filter(phone=phone).exists():
-                if request.accepted_renderer.format == "api":
-                    self.update(request, *args, **kwargs)
-                    return redirect(reverse("users:login"))
                 return self.update(request, *args, **kwargs)
-        if request.accepted_renderer.format == "api":
-            self.create(request, *args, **kwargs)
-            return redirect(reverse("users:login"))
         return self.create(request, *args, **kwargs)
+
+
+class CodeGetAPIView(APICodeGetAPIView):
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
+
+    def post(self, request, *args, **kwargs):
+        if self.request.data.get("phone"):
+            phone = self.request.data.get("phone")
+            if User.objects.filter(phone=phone).exists():
+                self.update(request, *args, **kwargs)
+            else:
+                self.create(request, *args, **kwargs)
+        return redirect(reverse('users:login'))
 
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
@@ -89,7 +96,7 @@ class UserProfile(views.APIView):
     permission_classes = [IsAuthenticated]
     template_name = "users/profile.html"
 
-    @swagger_auto_schema(operation_description="GET /user/", responses={status.HTTP_200_OK: UserSerializer()})
+    @swagger_auto_schema(operation_description="GET /accounts/profile/", responses={status.HTTP_200_OK: UserSerializer()})
     def get(self, request):
         user = User.objects.filter(pk=request.user.pk)[0]
         return Response({"user": user})

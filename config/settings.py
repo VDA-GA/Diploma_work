@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "corsheaders",
     "drf_yasg",
     "users.apps.UsersConfig",
 ]
@@ -145,3 +146,19 @@ SIMPLE_JWT = {
 
 LOGIN_REDIRECT_URL = "users:profile"
 LOGOUT_REDIRECT_URL = "users:login"
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://read-and-write.example.com",
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_ALLOW_CREDENTIALS = True

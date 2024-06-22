@@ -61,7 +61,7 @@ class CodeGetAPIView(APICodeGetAPIView):
                 self.update(request, *args, **kwargs)
             else:
                 self.create(request, *args, **kwargs)
-        return redirect(reverse('users:login'))
+        return redirect(reverse("users:login"))
 
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
@@ -96,7 +96,9 @@ class UserProfile(views.APIView):
     permission_classes = [IsAuthenticated]
     template_name = "users/profile.html"
 
-    @swagger_auto_schema(operation_description="GET /accounts/profile/", responses={status.HTTP_200_OK: UserSerializer()})
+    @swagger_auto_schema(
+        operation_description="GET /accounts/profile/", responses={status.HTTP_200_OK: UserSerializer()}
+    )
     def get(self, request):
         user = User.objects.filter(pk=request.user.pk)[0]
         return Response({"user": user})

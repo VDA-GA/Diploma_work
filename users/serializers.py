@@ -14,9 +14,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "phone", "invite_code", "activate_code", "invited_users"]
         read_only_fields = ("id", "phone", "invite_code", "invited_users")
-        # extra_kwargs = {
-        #     "invited_by": {"write_only": True},
-        # }
 
     def validate_activate_code(self, value):
         pk_user = self.context["request"].user.pk

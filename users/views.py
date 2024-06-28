@@ -25,7 +25,8 @@ class APICodeGetAPIView(mixins.CreateModelMixin, mixins.UpdateModelMixin, Generi
 
     def perform_create(self, serializer):
         user = serializer.save()
-        user.set_password(generate_password())
+        password = generate_password()
+        user.set_password(password)
         while True:
             invite_code = generate_invited_code()
             if User.objects.filter(invite_code=invite_code).exists():
@@ -33,7 +34,7 @@ class APICodeGetAPIView(mixins.CreateModelMixin, mixins.UpdateModelMixin, Generi
             else:
                 user.invite_code = invite_code
                 break
-        send_code(user.phone, invite_code)
+        send_code(user.phone, password)
         user.save()
 
     def perform_update(self, serializer):
